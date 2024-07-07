@@ -1,0 +1,23 @@
+# Logs, temporary files, etc.
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.env
+
+# Compiled JavaScript and type maps
+/dist
+
+# Dependency directories
+node_modules/
+jspm_packages/
+package-lock.json
+
+# TypeScript-specific
+*.tsbuildinfo
+
+# IDE/Editor configurations
+.vscode/
+.idea/
