@@ -9,6 +9,7 @@ const client = new OpenAI({
     defaultHeaders: { 'api-key': process.env.AZURE_OPENAI_API_KEY },
 });
 
+
 function generateMessage(prompt: String): any {
     return {
         role: 'user',
