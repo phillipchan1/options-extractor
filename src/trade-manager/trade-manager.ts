@@ -3,6 +3,7 @@ import { client } from "../services/openai";
 import { TradeEntry } from "./trade-manager.types";
 import { extractionPrompt } from "./trade-manager.config";
 import { formatDate, validateObjectShape } from "../utils/utils";
+import { uploadToAzureBlob } from "../services/azure-blob-storage";
 
 async function addTradeToDatabase(databaseId: string, trade: TradeEntry) {
     try {
@@ -30,17 +31,37 @@ async function addTradeToDatabase(databaseId: string, trade: TradeEntry) {
             },
             "Buy Strike Price": {
                 number: trade.buyStrikePrice || null
+            },
+            "Trade Date": {
+                date: { start: trade.tradeDate }
             }
         };
 
-        const tradeDate = formatDate(trade.tradeDate);
-        if (tradeDate) {
-            properties["Trade Date"] = { date: { start: tradeDate } };
+        if (trade.tradingPlan) {
+            properties["Trading Plan"] = {
+                rich_text: [{ text: { content: trade.tradingPlan } }]
+            };
         }
 
         const expirationDate = formatDate(trade.expirationDate);
         if (expirationDate) {
             properties["Expiration Date"] = { date: { start: expirationDate } };
+        }
+
+        if (trade.screenshot) {
+            const screenshotUrl = await uploadToAzureBlob(trade.screenshot, "screenshot.png");
+            properties["Screenshot"] = {
+                type: "files",
+                files: [
+                    {
+                        type: "external",
+                        name: "screenshot.png",
+                        external: {
+                            url: screenshotUrl
+                        }
+                    }
+                ]
+            };
         }
 
         const response = await notion.pages.create({

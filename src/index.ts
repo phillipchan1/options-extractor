@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import multer from 'multer';
 import * as dotenv from 'dotenv';
 import { addTradeToDatabase, extractTradeFromImage } from './trade-manager/trade-manager';
@@ -12,19 +12,35 @@ const upload = multer({ storage: storage });
 
 app.post(
   '/insert-option',
-  upload.single('image'),
+  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'screenshot', maxCount: 1 }]),
   async (req: express.Request, res: express.Response) => {
     try {
-      if (!req.file) {
-        return res.status(400).send("No image file uploaded");
-      }
-
       const notionDatabaseId = process.env.NOTION_DATABASE_ID;
       if (!notionDatabaseId) {
         return res.status(500).send("Notion database ID is undefined.");
       }
 
-      const trade = await extractTradeFromImage(req.file.buffer);
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const imageFile = files['image'] ? files['image'][0] : null;
+      const screenshotFile = files['screenshot'] ? files['screenshot'][0] : null;
+
+      if (!imageFile) {
+        return res.status(400).send("No image file uploaded");
+      }
+
+      let trade = await extractTradeFromImage(imageFile.buffer);
+
+      // Conditionally update trade properties
+      if (req.body.tradingPlan) trade.tradingPlan = req.body.tradingPlan;
+      if (req.body.entryNotes) trade.entryNotes = req.body.entryNotes;
+
+      // Set trade date to today
+      trade.tradeDate = new Date().toISOString().split('T')[0];
+
+      // Add screenshot if provided
+      if (screenshotFile) {
+        trade.screenshot = screenshotFile.buffer;  // Directly assign the buffer
+      }
 
       await addTradeToDatabase(notionDatabaseId, trade);
 
