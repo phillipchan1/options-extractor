@@ -30,16 +30,13 @@ app.post(
 
       let trade = await extractTradeFromImage(imageFile.buffer);
 
-      // Conditionally update trade properties
       if (req.body.tradingPlan) trade.tradingPlan = req.body.tradingPlan;
       if (req.body.entryNotes) trade.entryNotes = req.body.entryNotes;
 
-      // Set trade date to today
       trade.tradeDate = new Date().toISOString().split('T')[0];
 
-      // Add screenshot if provided
       if (screenshotFile) {
-        trade.screenshot = screenshotFile.buffer;  // Directly assign the buffer
+        trade.screenshot = screenshotFile.buffer;
       }
 
       await addTradeToDatabase(notionDatabaseId, trade);
