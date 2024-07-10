@@ -1,84 +1,96 @@
-# BRD-AI
+# Trade Manager
 
-A tool for automatically generating Business Requirements Documents (BRDs) using advanced AI language models, such as OpenAI's GPT models.
+## Overview
 
-## Key Features
+The Trade Manager is a Node.js application that allows users to upload option trade images and automatically extract trade details to store in a Notion database. The application leverages the OpenAI API for image processing and extraction of trade information, as well as Azure Blob Storage for storing screenshots.
 
-- Generates comprehensive BRD sections, including:
-  - Title Page
-  - Document Information
-  - Requirements
-  - Business Policies
+## Features
 
-## Installation
+- Upload option trade images and screenshots.
+- Extract trade details from images using OpenAI's GPT-4.
+- Store trade information in a Notion database.
+- Store trade screenshots in Azure Blob Storage.
 
-1. **Clone the repository:**
+## Prerequisites
 
-   ```bash
-   git clone [https://github.com/phillipchan1/brd-ai-middleware](https://github.com/phillipchan1/brd-ai-middleware)
-   ```
+- Node.js (v14.x or higher)
+- npm (v6.x or higher)
+- A Notion database
+- Azure Blob Storage account
+- OpenAI API key
 
-2. **Install dependencies**
+## Setup
 
-   ```bash
-   cd brd-ai
-   npm install
-   ```
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/yourusername/trade-manager.git
+    cd trade-manager
+    ```
+
+2. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Create a `.env` file in the root of the project and add the following environment variables:
+
+    ```plaintext
+    PORT=8000
+    NOTION_DATABASE_ID=your_notion_database_id
+    OPENAI_API_KEY=your_openai_api_key
+    AZURE_STORAGE_ACCOUNT=your_azure_storage_account_name
+    AZURE_STORAGE_ACCESS_KEY=your_azure_storage_access_key
+    ```
+
+4. Start the application:
+
+    ```bash
+    npm start
+    ```
 
 ## Usage
 
-Obtain OpenAI API Key
+The application exposes an endpoint to upload option trade images and screenshots. The extracted trade details are stored in a Notion database, and screenshots are stored in Azure Blob Storage.
 
-Go to the Azure resource to get the key
+### Endpoint
 
-## Set Environment Variable
+#### `POST /insert-option`
 
-Create a .env file in the project's root directory.
-Add the following line, replacing with your actual API key:
-OPENAI_API_KEY=your_openai_api_key
+- **Description**: Upload an option trade image and an optional screenshot, and store the extracted trade details in a Notion database.
 
-## Start the server:
+- **Request**:
+    - Headers:
+        - `Content-Type: multipart/form-data`
+    - Body:
+        - `image`: (required) The option trade image file.
+        - `screenshot`: (optional) The screenshot file.
+        - `tradingPlan`: (optional) The trading plan as a string.
+        - `entryNotes`: (optional) The entry notes as a string.
 
-```Bash
-npm run dev
-Use code with caution.
-```
+- **Response**:
+    - `200 OK`: Trade added to the database successfully.
+    - `400 Bad Request`: No image file uploaded.
+    - `500 Internal Server Error`: Error processing the request or Notion database ID is undefined.
 
-Or for production builds:
+## Code Overview
 
-Bash
-npm run build
-npm start
-Use code with caution.
+### `index.ts`
 
-## Send a POST request:
+This file sets up the Express server and defines the `/insert-option` endpoint for uploading trade images and screenshots. It processes the request, extracts trade details using the `extractTradeFromImage` function, and adds the trade to the Notion database using the `addTradeToDatabase` function.
 
-```Bash
-curl -X POST http://localhost:3000/brd \
-     -H "Content-Type: application/json" \
-     -d '{"projectBrief": "Your detailed project description here"}'
-```
+### `trade-manager/trade-manager.ts`
 
-Replace "Your detailed project description here" with `projectBrief.json`
+This file contains the core logic for extracting trade details from images and adding trade entries to the Notion database.
 
-## Response
-
-The server will respond with a Markdown-formatted BRD, ready for download.
-
-## Dependencies
-
-Node.js
-Express
-OpenAI
-Typescript (for development)
-See package.json for the full list.
+- `addTradeToDatabase(databaseId: string, trade: TradeEntry)`: Adds a trade entry to the specified Notion database.
+- `extractTradeFromImage(imageBuffer: Buffer, maxRetries = 3)`: Extracts trade details from the provided image buffer using OpenAI's GPT-4.
 
 ## Contributing
 
-We welcome contributions to BRD-AI! Please refer to our CONTRIBUTING.md file (feel free to create one) for guidelines on how to get involved.
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more details.
 
 ## License
 
-This project is licensed under the ISC License - see the LICENSE file for details.
-
-Let me know if you'd like any modifications or have any further details about your project that you would like included in the README!
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
