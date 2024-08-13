@@ -10,7 +10,12 @@ export const extractionPrompt = `
     -40 is the sell contract
     58 is the sell strike price
     1.10 is the buy contract price
-    for tradeType, if
+    for tradeType, there are 4 options
+        "Bear Call" - if sell contract is a call AND credit (difference between sell contract and buy contract) is > 0
+        "Bull Put" - if sell contract is a put AND credit (difference between sell contract and buy contract) is > 0
+        "Debit Spread - Bull" - if sell contract is a call AND credit (difference between sell contract and buy contract) is < 0
+        "Debit Spread - Bear" - if sell contract is a put AND credit (difference between sell contract and buy contract) is < 0
+
         credit (difference between sell contract and buy contract) is > 0, it's going to be credit spread
             if the sell contract is a call, it's a "Bear Call", if it's a put, it's "Bull Put"
         credit is < 0, it's going to be debit spread
@@ -21,7 +26,7 @@ export const extractionPrompt = `
     {
         "security": string,
         "entryNotes": string,
-        "tradeType": "Debit Spread - Bull" | "Debit Spread - Bear",
+        "tradeType": "Bear Call" | "Bull Put" | "Debit Spread - Bull" | "Debit Spread - Bear",
         "tradeDate": string (Format: "YYYY-MM-DD"),
         "expirationDate": string (Format: "YYYY-MM-DD"),
         "sellContractPrice": number,
