@@ -10,7 +10,11 @@ export const extractionPrompt = `
     -40 is the sell contract
     58 is the sell strike price
     1.10 is the buy contract price
-    for tradeType, if the sell contract is a put, it's a "Debit Spread - Bear", if it's a call, it's "Debit Spread - Bull"
+    for tradeType, if
+        credit (difference between sell contract and buy contract) is > 0, it's going to be credit spread
+            if the sell contract is a call, it's a "Bear Call", if it's a put, it's "Bull Put"
+        credit is < 0, it's going to be debit spread
+            if the sell contract is a put, it's a "Debit Spread - Bear", if it's a call, it's "Debit Spread - Bull"
         
     You will return to me ONLY the JSON that matches this interface:
 
