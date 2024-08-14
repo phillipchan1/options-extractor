@@ -107,11 +107,12 @@ async function extractTradeFromImage(imageBuffer: Buffer, maxRetries = 3): Promi
 
             try {
                 const parsedContent = JSON.parse(jsonContent);
+                console.log("Extracted trade information:", parsedContent);
 
                 const isValidTradeEntry = validateObjectShape<TradeEntry>(parsedContent, {
                     security: 'string',
                     entryNotes: 'string',
-                    tradeType: ['Debit Spread - Bull', 'Debit Spread - Bear'],
+                    tradeType: ['Debit Spread - Bull', 'Debit Spread - Bear', 'Bear Call', 'Bull Put'],
                     tradeDate: 'string',
                     expirationDate: 'string',
                     sellContractPrice: 'number',
