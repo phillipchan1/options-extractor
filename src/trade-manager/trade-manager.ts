@@ -107,7 +107,7 @@ async function extractTradeFromImage(imageBuffer: Buffer, maxRetries = 3): Promi
 
             try {
                 const parsedContent = JSON.parse(jsonContent);
-                console.log("Extracted trade information:", parsedContent);
+                setTradeType(parsedContent);
 
                 const isValidTradeEntry = validateObjectShape<TradeEntry>(parsedContent, {
                     security: 'string',
@@ -115,6 +115,7 @@ async function extractTradeFromImage(imageBuffer: Buffer, maxRetries = 3): Promi
                     tradeType: ['Debit Spread - Bull', 'Debit Spread - Bear', 'Bear Call', 'Bull Put'],
                     tradeDate: 'string',
                     expirationDate: 'string',
+                    optionType: ['CALL', 'PUT'],
                     sellContractPrice: 'number',
                     buyContractPrice: 'number',
                     numberOfContracts: 'number',
@@ -142,6 +143,24 @@ async function extractTradeFromImage(imageBuffer: Buffer, maxRetries = 3): Promi
     }
 
     throw new Error(`Failed to extract trade information after ${maxRetries} attempts`);
+}
+
+function setTradeType(trade: TradeEntry) {
+    if (trade.sellContractPrice < trade.buyContractPrice) {
+        console.log("Debit Spread");
+        if (trade.optionType === "CALL") {
+            trade.tradeType = "Debit Spread - Bull";
+        } else {
+            trade.tradeType = "Debit Spread - Bear";
+        }
+    } else {
+        console.log("Credit Spread");
+        if (trade.optionType === "CALL") {
+            trade.tradeType = "Bear Call";
+        } else {
+            trade.tradeType = "Bull Put";
+        }
+    }
 }
 
 export { addTradeToDatabase, extractTradeFromImage }

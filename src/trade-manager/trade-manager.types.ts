@@ -6,6 +6,7 @@ export interface TradeEntry {
     expirationDate: string;
     sellContractPrice: number;
     buyContractPrice: number;
+    optionType: "CALL" | "PUT";
     numberOfContracts: number;
     sellStrikePrice: number;
     buyStrikePrice: number;

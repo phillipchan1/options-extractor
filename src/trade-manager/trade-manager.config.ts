@@ -15,12 +15,12 @@ export const extractionPrompt = `
     {
         "security": string,
         "entryNotes": string,
-        "tradeType": "Bear Call" | "Bull Put",
         "tradeDate": string (Format: "YYYY-MM-DD"),
         "expirationDate": string (Format: "YYYY-MM-DD"),
         "sellContractPrice": number,
         "buyContractPrice": number,
         "numberOfContracts": number,
+        "optionType: "CALL" | "PUT",
         "sellStrikePrice": number,
         "buyStrikePrice": number
     }
@@ -32,14 +32,9 @@ export const extractionPrompt = `
     257.5 is the buy strike price
     2.07 is the sell contract price
     1.10 is the buy contract price
+    CALL is the optionType
 
-    for tradeType, here is logic to determine the trade type:
-        if (sellContractPrice - buyContractPrice) > 0 && sell contract is a call, then it is a "Bear Call"
-        if (sellContractPrice - buyContractPrice) > 0 && sell contract is a put, then it is a "Bull Put"
-
-    for expirationDate, it is the date of the contract expiration. for your reference today is ${new Date().toISOString().split('T')[0]}
-
-        
+    for expirationDate, it is the date of the contract expiration. for your reference today is ${new Date().toISOString().split('T')[0]}        
 
     Ensure all fields are populated. If you can't determine a value, use null for numbers and an empty string for strings.
     Do not include any markdown formatting or code block indicators in your response, just the raw JSON.
